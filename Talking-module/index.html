@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="icon" href="data:,">
 
-  <title>HeadTTS - TalkingHead Demo</title>
+  <title>Talking-module - TalkingHead Demo</title>
 
   <style>
     body, html { width:100%; height:100%; height:100dvh; margin: 0; padding: 0; position: relative; background-color: #202020; color: white; overflow: hidden; }
@@ -31,18 +31,18 @@
       "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js/+esm",
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
       "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.5/modules/talkinghead.mjs",
-      "headtts": "./modules/headtts.mjs"
+      "talkingModule": "./modules/talking-module.mjs"
     }
   }
   </script>
 
   <script type="module">
     import { TalkingHead } from "talkinghead";
-    import { HeadTTS } from "headtts";
+    import { TalkingModule } from "talkingModule";
 
     // Globals
     let head; // TalkingHead instance
-    let headtts; // HeadTTS instance
+    let talkingModule; // Talking-module instance
     const el = {}; // DOM elements based in `id` property
 
     // Avatars
@@ -92,7 +92,7 @@
       const person = persons[el.person.options[el.person.selectedIndex].value];
 
       // Progress info
-      const info = { head: "-", headtts:"-" };
+      const info = { head: "-", talkingModule:"-" };
       const updateInfo = (name,ev) => {
         if ( ev ) {
           if ( ev.lengthComputable ) {
@@ -101,7 +101,7 @@
             info[name] = Math.round(ev.loaded / 1000) + "KB";
           }
         }
-        let s = "Loading: " + info.head + " / " + info.headtts;
+        let s = "Loading: " + info.head + " / " + info.talkingModule;
         if ( info.hasOwnProperty("error") ) {
           s += " ERROR:<br>&gt; " + info.error.replaceAll("\n","<br>&gt; ");
         }
@@ -117,7 +117,7 @@
 
         await Promise.all([
           head.showAvatar( person.avatar, updateInfo.bind(null,"head") ),
-          headtts.connect( null, updateInfo.bind(null,"headtts"))
+          talkingModule.connect( null, updateInfo.bind(null,"talkingModule"))
         ]);
 
         // Setup view
@@ -125,7 +125,7 @@
         head.cameraClock = 999; // Hack to prevent smooth transition
 
         // Setup voice
-        headtts.setup( person.setup );
+        talkingModule.setup( person.setup );
 
         el.info.style.display = 'none';
         el.person.disabled = false;
@@ -145,7 +145,7 @@
     * Add the given word to subtitles and reset the clear timer.
     * Play hand gestures for pre-defined keywords.
     *
-    * @param {Object} msg HeadTTS response message
+    * @param {Object} msg Talking-module response message
     * @param {string} word Word that is been currently spoken
     * @param {number} [ms=2000] Timeout for clearing subtitles, in milliseconds
     */
@@ -200,8 +200,8 @@
         cameraRotateEnable: false
       });
 
-      // Instantiate HeadTTS text-to-speech class
-      headtts = new HeadTTS({
+      // Instantiate Talking-module text-to-speech class
+      talkingModule = new TalkingModule({
         endpoints: ["webgpu", "ws://127.0.0.1:8882/", "wasm"], // Endpoints
         languages: ["en-us"], // Language to be pre-loaded
         voices: ["af_bella","am_fenrir"], // Voices to be pre-loaded
@@ -212,10 +212,10 @@
 
       // For debugging
       window.head = head;
-      window.headtts = headtts;
+      window.talkingModule = talkingModule;
 
       // Speak and lipsync
-      headtts.onmessage = (message) => {
+      talkingModule.onmessage = (message) => {
         if ( message.type === "audio" ) {
           try {
             head.speakMarker( clearSubtitles );
@@ -242,7 +242,7 @@
       el.speak.addEventListener('click', async function () {
         let text = document.getElementById('text').value;
         if ( text ) {
-          headtts.synthesize({
+          talkingModule.synthesize({
             input: text
           });
         }

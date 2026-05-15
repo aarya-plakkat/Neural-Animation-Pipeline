@@ -61,7 +61,7 @@ eventHandler.onmessage = async (ev) => {
     }
     connect();
   } else {
-    console.error('HeadTTS Worker: Unknown message type "' + message.type + '".');
+    console.error('Talking-module Worker: Unknown message type "' + message.type + '".');
   }
 }
 
@@ -115,7 +115,7 @@ async function connect() {
   try {
     ({ StyleTextToSpeech2Model, AutoTokenizer, Tensor } = await import(settings.transformersModule));
   } catch(error) {
-    console.error("HeadTTS Worker: Importing modules failed, error=", error);
+    console.error("Talking-module Worker: Importing modules failed, error=", error);
     throw new Error("Importing modules failed.");
   }
 
@@ -156,7 +156,7 @@ async function connect() {
     model = results[0];
     tokenizer = results[1];
   } catch(error) {
-    console.error("HeadTTS Worker: Loading models failed, error=", error, " settings=", settings);
+    console.error("Talking-module Worker: Loading models failed, error=", error, " settings=", settings);
     throw new Error("Loading models failed.");
   }
 
@@ -236,7 +236,7 @@ async function loadVoice(s) {
             return buffer;
           }
         }
-        throw new Error('HeadTTS Worker: Error loading voice "' + s + '".');
+        throw new Error('Talking-module Worker: Error loading voice "' + s + '".');
       })()
     ]);
     voices.set( s, voice );
@@ -315,7 +315,7 @@ async function process() {
     try {
       language = await loadLanguage(d.language);
     } catch(error) {
-      console.error("HeadTTS Worker: Error loading language module, error=", error, " item=", item);
+      console.error("Talking-module Worker: Error loading language module, error=", error, " item=", item);
       item.ref = item.id;
       delete item.id;
       item.type = "error";
@@ -348,7 +348,7 @@ async function process() {
     try {
       voice = await loadVoice(d.voice);
     } catch(error) {
-      console.error("HeadTTS Worker: Error loading voice, error=", error, " item=", item);
+      console.error("Talking-module Worker: Error loading voice, error=", error, " item=", item);
       item.ref = item.id;
       delete item.id;
       item.type = "error";

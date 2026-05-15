@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HeadTTS - Latency</title>
+  <title>Talking-module - Latency</title>
 
   <style>
     body, html { width:100%; height:100%; max-width: 900px; margin: auto; position: relative; background-color: #202020; color: white; line-height: 28px; }
@@ -24,7 +24,7 @@
   <script type="importmap">
   { "imports":
     {
-      "headtts": "../modules/headtts.mjs",
+      "talkingModule": "../modules/talking-module.mjs",
       "utils": "../modules/utils.mjs"
     }
   }
@@ -33,25 +33,25 @@
 
   <script type="module">
     import * as utils from "utils";
-    import { HeadTTS } from "headtts";
-    let headtts;
+    import { TalkingModule } from "talkingModule";
+    let talkingModule;
 
     // TEST CASES
     const testcases = {
-      "headtts-browser-fp32-webgpu": {
-        fn: headttsTestRun,
+      "talking-module-browser-fp32-webgpu": {
+        fn: talkingModuleTestRun,
         params: [ "webgpu", "fp32" ]
       },
-      "headtts-browser-q4-wasm": {
-        fn: headttsTestRun,
+      "talking-module-browser-q4-wasm": {
+        fn: talkingModuleTestRun,
         params: [ "wasm", "q4" ]
       },
-      "headtts-node-websocket": {
-        fn: headttsTestRun,
+      "talking-module-node-websocket": {
+        fn: talkingModuleTestRun,
         params: [ "ws://127.0.0.1:8882" ]
       },
-      "headtts-node-rest": {
-        fn: headttsTestRun,
+      "talking-module-node-rest": {
+        fn: talkingModuleTestRun,
         params: [ "http://127.0.0.1:8882/v1" ]
       },
       "google-tts": {
@@ -185,8 +185,8 @@
       }
     }
 
-    // HeadTTS
-    async function headttsTestRun( id, endpoint, dtype ) {
+    // Talking-module
+    async function talkingModuleTestRun( id, endpoint, dtype ) {
 
       // Init
       updateStatus("INIT");
@@ -200,15 +200,15 @@
       if ( endpoint === "wasm" ) {
         if ( dtype ) init.dtypeWasm = dtype;
       }
-      headtts = new HeadTTS(init);
+      talkingModule = new TalkingModule(init);
 
       // Connect
       updateStatus("CONNECT");
-      await headtts.connect();
+      await talkingModule.connect();
 
       // Setup voice
       updateStatus("SETUP");
-      headtts.setup({
+      talkingModule.setup({
         voice: "af_bella",
         language: "en-us",
         speed: 1,
@@ -218,8 +218,8 @@
       // Warmup
       updateStatus("WARMUP");
       await new Promise( resolve => {
-        headtts.onend = () => resolve();
-        headtts.synthesize({ input: textWarmup });
+        talkingModule.onend = () => resolve();
+        talkingModule.synthesize({ input: textWarmup });
       });
 
       // Timeout
@@ -230,12 +230,12 @@
       let tsStart, tsFirstByte, tsEnd, audioDurationSec = 0, audios = [];
       await new Promise((resolve, reject) => {
 
-        headtts.onstart = () => {
+        talkingModule.onstart = () => {
           updateStatus("START");
           tsStart = performance.now();
         }
 
-        headtts.onmessage = (message) => {
+        talkingModule.onmessage = (message) => {
           if ( message.type === 'audio' ) {
             updateStatus("AUDIO#" + message.ref);
             if ( !tsFirstByte ) {
@@ -246,13 +246,13 @@
           }
         }
 
-        headtts.onend = () => {
+        talkingModule.onend = () => {
           tsEnd = performance.now();
           updateStatus("READY");
           resolve();
         }
 
-        headtts.synthesize({ input: textTest });
+        talkingModule.synthesize({ input: textTest });
 
       });
 

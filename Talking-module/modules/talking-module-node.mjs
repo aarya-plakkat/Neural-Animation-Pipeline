@@ -77,7 +77,7 @@ const config = {
 
 
 // Read JSON configuration file
-const file = getOptionValue("config") || "./headtts-node.json";
+const file = getOptionValue("config") || "./talking-module-node.json";
 const json = readFileSync(file, 'utf8');
 const trace = parseInt(getOptionValue("trace"));
 const o = JSON.parse(json);
@@ -223,7 +223,7 @@ if ( isSecure ) {
     wss = new WebSocketServer({ server: httpsServer });
   }
   httpsServer.listen(port, () => {
-    console.info("HeadTTS-Node SECURE server running on port " + port + ".");
+    console.info("Talking-module SECURE server running on port " + port + ".");
   });
 } else {
   const httpServer = http.createServer(handler);
@@ -231,7 +231,7 @@ if ( isSecure ) {
     wss = new WebSocketServer({ server: httpServer });
   }
   httpServer.listen(port, () => {
-    console.info("HeadTTS-Node server running on port " + port + "." );
+    console.info("Talking-module server running on port " + port + "." );
   });
 }
 
@@ -316,7 +316,7 @@ function restHandler(req,res) {
         utils.trace( "OUT: -> REST Client, HELLO" );
       }
       res.statusCode = 200;
-      res.end('HeadTTS v0.1.0');
+      res.end('Talking-module v0.1.0');
     } else {
       if ( isTraceMessages ) {
         utils.trace( "OUT: REST -> Client Error, Not found." );

@@ -1,6 +1,6 @@
-# <img src="logo.png" width="100"/>&nbsp; HeadTTS
+# <img src="logo.png" width="100"/>&nbsp; Talking-module
 
-**HeadTTS** is a free JavaScript text-to-speech (TTS) solution that
+**Talking-module** is a free JavaScript text-to-speech (TTS) solution that
 provides phoneme-level timestamps and Oculus visemes for lip-sync, in addition
 to audio output (WAV/PCM). It uses
 [Kokoro](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX-timestamped)
@@ -22,7 +22,7 @@ and not released, so server-side inference is relatively slow. English
 is currently the only supported language.
 
 **👉 If you're using a Chrome or Edge desktop browser, check out the
-[In-browser Demo](https://met4citizen.github.io/HeadTTS/)!**
+[In-browser Demo](https://met4citizen.github.io/Talking-module/)!**
 
 The project uses [websockets/ws](https://github.com/websockets/ws) (MIT License),
 [hugginface/transformers.js (with ONNX Runtime)](https://github.com/huggingface/transformers.js/)
@@ -37,35 +37,35 @@ You can find the list of supported English voices and voice samples
 
 ---
 
-# In-browser Module: `headtts.mjs`
+# In-browser Module: `talking-module.mjs`
 
-The HeadTTS JavaScript module enables in-browser text-to-speech
+The Talking-module JavaScript module enables in-browser text-to-speech
 using Module Web Workers and WebGPU/WASM inference. Alternatively, it can
-connect to and use the HeadTTS Node.js WebSocket/RESTful server.
+connect to and use the Talking-module Node.js WebSocket/RESTful server.
 
-Create a new `HeadTTS` class instance:
+Create a new `TalkingModule` class instance:
 
 ```javascript
-import { HeadTTS } from "./modules/headtts.mjs";
+import { TalkingModule } from "./modules/talking-module.mjs";
 
-const headtts = new HeadTTS({
+const talkingModule = new TalkingModule({
   endpoints: ["ws://127.0.0.1:8882", "webgpu"], // Endpoints in order of priority
   languages: ['en-us'], // Language modules to pre-load (in-browser)
   voices: ["af_bella", "am_fenrir"] // Voices to pre-load (in-browser)
 });
 ```
 
-Beware that if you import the HeadTTS module from a CDN, you may need to
+Beware that if you import the Talking-module module from a CDN, you may need to
 set the `workerModule` and `dictionaryURL` options explicitly,
 as the default relative paths will likely not work:
 
 ```javascript
-import { HeadTTS } from "https://cdn.jsdelivr.net/npm/@met4citizen/headtts@1.1/+esm";
+import { TalkingModule } from "https://cdn.jsdelivr.net/npm/@met4citizen/talking-module@1.1/+esm";
 
-const headtts = new HeadTTS({
+const talkingModule = new TalkingModule({
   /* ... */
-  workerModule: "https://cdn.jsdelivr.net/npm/@met4citizen/headtts@1.1/modules/worker-tts.mjs",
-  dictionaryURL: "https://cdn.jsdelivr.net/npm/@met4citizen/headtts@1.1/dictionaries/"
+  workerModule: "https://cdn.jsdelivr.net/npm/@met4citizen/talking-module@1.1/modules/worker-tts.mjs",
+  dictionaryURL: "https://cdn.jsdelivr.net/npm/@met4citizen/talking-module@1.1/dictionaries/"
 });
 ```
 
@@ -76,7 +76,7 @@ Option | Description | Default value
 --- | --- | ---
 `endpoints` | List of WebSocket/RESTful servers or backends `webgpu` or `wasm`, in order of priority. If one fails, the next is used.  | `["webgpu",`<br>` "wasm"]`
 `audioCtx` | Audio context for creating audio buffers. If `null`, a new one is created. | `null`
-`workerModule` | URL of the HeadTTS Web Worker module. Enables use from a CDN. If set to `null`, the relative path/file `./worker-tts.mjs` is used. | `null`
+`workerModule` | URL of the Talking-module Web Worker module. Enables use from a CDN. If set to `null`, the relative path/file `./worker-tts.mjs` is used. | `null`
 `transformersModule` | URL of the `transformers.js` module to load. | `"https://cdn.jsdelivr.net/npm/`<br>`@huggingface/transformers@3.7.2`<br>`/dist/transformers.min.js"`
 `model` | Kokoro text-to-speech ONNX model (timestamped) used for in-browser inference. | `"onnx-community/`<br>`Kokoro-82M-v1.0-ONNX-timestamped"`
 `dtypeWebgpu` | Data type precision for WebGPU inference: `"fp32"` (recommended), `"fp16"`, `"q8"`, `"q4"`, or `"q4f16"`.  | `"fp32"`
@@ -108,7 +108,7 @@ Connect to the first supported/available endpoint:
 
 ```javascript
 try {
-  await headtts.connect();
+  await talkingModule.connect();
 } catch(error) {
   console.error(error);
 }
@@ -121,7 +121,7 @@ to play the incoming audio and lip-sync data:
 
 ```javascript
 // Speak and lipsync
-headtts.onmessage = (message) => {
+talkingModule.onmessage = (message) => {
   if ( message.type === "audio" ) {
     try {
       head.speakAudio( message.data, {}, (word) => {
@@ -153,7 +153,7 @@ Event handler | Description
 Setup the voice:
 
 ```javascript
-headtts.setup({
+talkingModule.setup({
   voice: "af_bella",
   language: "en-us",
   speed: 1,
@@ -161,14 +161,14 @@ headtts.setup({
 });
 ```
 
-The HeadTTS client is stateful, so you don't need to call setup again
+The Talking-module client is stateful, so you don't need to call setup again
 unless you want to change a setting. For example, if you want to increase
-the speed, simply call `headtts.setup({ speed: 1.5 })`.
+the speed, simply call `talkingModule.setup({ speed: 1.5 })`.
 
 Synthesize speech using the current voice setup:
 
 ```javascript
-headtts.synthesize({
+talkingModule.synthesize({
   input: "Test sentence."
 });
 ```
@@ -180,7 +180,7 @@ approach for real-time use cases. An alternative approach is to
 
 ```javascript
 try {
-  const messages = await headtts.synthesize({
+  const messages = await talkingModule.synthesize({
     input: "Some long text..."
   });
   console.log(messages); // [{type: 'audio', data: {…}, ref: 1}, {…}, ...]
@@ -232,7 +232,7 @@ You can add a custom message to the message queue using
 the `custom` method:
 
 ```javascript
-headtts.custom({
+talkingModule.custom({
   emoji: "😀"
 });
 ```
@@ -247,7 +247,7 @@ functionality yourself within the message handler.
 
 Method | Description
 --- | ---
-`connect( settings=null, onprogress=null, onerror=null )` | Connects to the specified set of `endpoints` set in constructor or within the optinal `settings` object. If the `settings` parameter is provided, it forces a reconnection. The `onprogress` callback handles `ProgressEvent` events, while the `onerror` callback handles system-level error events. Returns a promise. **Note:** When connecting to a RESTful server, the method sends a hello message and considers the connection established only if a text response starting with `HeadTTS` is received.
+`connect( settings=null, onprogress=null, onerror=null )` | Connects to the specified set of `endpoints` set in constructor or within the optinal `settings` object. If the `settings` parameter is provided, it forces a reconnection. The `onprogress` callback handles `ProgressEvent` events, while the `onerror` callback handles system-level error events. Returns a promise. **Note:** When connecting to a RESTful server, the method sends a hello message and considers the connection established only if a text response starting with `Talking-module` is received.
 `clear()` | Clears all work queues and resolves all promises.
 `setup( data, onerror=null )` | Adds a new setup request to the work queue. See the API section for the supported `data` properties. Returns a promise.
 `synthesize( data, onmessage=null, onerror=null )` | Adds a new synthesis request to the work queue. The `data` object supports the `input` and `userData` properties. The `userData` property is returned in the output as `message.userData` unchanged. If event handlers are provided, they override the default handlers. Returns a promise that resolves with a sorted array of related messages of type `"audio"` or `"error"`.
@@ -257,13 +257,13 @@ Method | Description
 
 ---
 
-# NodeJS WebSocket/RESTful Server: `headtts-node.mjs`
+# NodeJS WebSocket/RESTful Server: `talking-module-node.mjs`
 
 Install (requires Node.js v20+):
 
 ```bash
-git clone https://github.com/met4citizen/HeadTTS
-cd HeadTTS
+git clone https://github.com/met4citizen/Talking-module
+cd Talking-module
 npm install
 ```
 
@@ -278,18 +278,18 @@ npm start
 
 Option|Description|Default
 ---|---|---
-`--config [file]` | JSON configuration file name. | `./headtts-node.json`
+`--config [file]` | JSON configuration file name. | `./talking-module-node.json`
 `--trace [0-255]` | Bitmask for debugging subsystems (`0`=none, `255`=all):<br><ul><li>Bit 0 (1): Connection</li><li>Bit 1 (2): Messages</li><li>Bit 2 (4): Events</li><li>Bit 3 (8): G2P</li><li>Bit 4 (16): Language modules</li></ul> | `0`
 
 An example:
 
 ```bash
-node ./modules/headtts-node.mjs --trace 16
+node ./modules/talking-module-node.mjs --trace 16
 ```
 
 </details>
 
-By default, the server uses the `./headtts-node.json` configuration file.
+By default, the server uses the `./talking-module-node.json` configuration file.
 
 <details>
   <summary>CLICK HERE to see the configurable PROPERTIES.</summary>
@@ -413,7 +413,7 @@ either a WAV file (`wav`) or a chunk of raw PCM 16bit LE samples (`pcm`).
 
 RESTful server API is a more simple alternative for WebSocket API.
 The REST server is stateless, so voice parameters must be included
-for each POST message. If you are using the HeadTTS client class,
+for each POST message. If you are using the Talking-module client class,
 it handles this internally.
 
 ### POST `/v1/synthesize`
@@ -530,18 +530,18 @@ floating point precision (fp32) for the best audio quality unless
 memory consumption becomes a concern.
 
 Unofficial latency results using my own
-[latency test app](https://github.com/met4citizen/HeadTTS/blob/main/tests/latency.html):
+[latency test app](https://github.com/met4citizen/Talking-module/blob/main/tests/latency.html):
 
 TTS Engine | Setup |`FIL`<sup>\[1]</sup>|`FBL`<sup>\[2]</sup>|`RTF`<sup>\[3]</sup>
 ---|---|---|---|---
-HeadTTS, in-browser | Chrome, WebGPU/fp32 | 9.4s | 958ms | 0.30
-HeadTTS, in-browser | Edge, WebGPU/fp32 | 8.7s | 913ms | 0.28
-HeadTTS, in-browser | Chrome, WASM/q4 | 88.4s | 8752ms | 2.87
-HeadTTS, in-browser | Edge, WASM/q4 | 44.8s | 4437ms | 1.46
-HeadTTS, server | WebSocket, CPU/fp32, 1 thread | 6.8s | 712ms | 0.22
-HeadTTS, server | WebSocket, CPU/fp32, 4 threads | 6.0s | 2341ms | 0.20
-HeadTTS, server | REST, CPU/fp32, 1 thread | 7.0s | 793ms | 0.23
-HeadTTS, server | REST, CPU/fp32, 4 threads | 6.5s | 2638ms | 0.21
+Talking-module, in-browser | Chrome, WebGPU/fp32 | 9.4s | 958ms | 0.30
+Talking-module, in-browser | Edge, WebGPU/fp32 | 8.7s | 913ms | 0.28
+Talking-module, in-browser | Chrome, WASM/q4 | 88.4s | 8752ms | 2.87
+Talking-module, in-browser | Edge, WASM/q4 | 44.8s | 4437ms | 1.46
+Talking-module, server | WebSocket, CPU/fp32, 1 thread | 6.8s | 712ms | 0.22
+Talking-module, server | WebSocket, CPU/fp32, 4 threads | 6.0s | 2341ms | 0.20
+Talking-module, server | REST, CPU/fp32, 1 thread | 7.0s | 793ms | 0.23
+Talking-module, server | REST, CPU/fp32, 4 threads | 6.5s | 2638ms | 0.21
 ElevenLabs | WebSocket | 4.8s | 977ms | 0.20
 ElevenLabs | REST | 11.3s | 1097ms | 0.46
 ElevenLabs | REST, Flash_v2_5 | 4.8s | 581ms | 0.22

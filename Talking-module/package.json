@@ -1,13 +1,13 @@
 {
-  "name": "@met4citizen/headtts",
+  "name": "@met4citizen/talking-module",
   "version": "1.1.1",
-  "description": "HeadTTS: A free Javascript text-to-speech with timestamps and visemes.",
-  "main": "modules/headtts.mjs",
+  "description": "Talking-module: A free Javascript text-to-speech with timestamps and visemes.",
+  "main": "modules/talking-module.mjs",
   "type": "module",
   "files": [
     "README.md",
     "LICENSE",
-    "headttsd.json",
+    "talking-module-node.json",
     "modules/",
     "dictionaries/"
   ],
@@ -16,13 +16,13 @@
     "ws": "^8.18.3"
   },
   "scripts": {
-    "start": "node ./modules/headtts-node.mjs",
+    "start": "node ./modules/talking-module-node.mjs",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "postinstall": "mkdir -p -m 777 ./node_modules/@huggingface/transformers/.cache"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/met4citizen/HeadTTS.git"
+    "url": "git+https://github.com/met4citizen/Talking-module.git"
   },
   "keywords": [
     "talkinghead",
@@ -35,9 +35,9 @@
   "author": "Mika Suominen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/met4citizen/HeadTTS/issues"
+    "url": "https://github.com/met4citizen/Talking-module/issues"
   },
-  "homepage": "https://github.com/met4citizen/HeadTTS#readme",
+  "homepage": "https://github.com/met4citizen/Talking-module#readme",
   "devDependencies": {
     "jest": "^29.7.0"
   }

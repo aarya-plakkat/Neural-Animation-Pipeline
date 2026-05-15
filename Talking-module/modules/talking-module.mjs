@@ -6,7 +6,7 @@
 
 import * as utils from "./utils.mjs";
 
-class HeadTTS {
+class TalkingModule {
 
   /**
   * @constructor
@@ -306,7 +306,7 @@ class HeadTTS {
             endpointSetup.dtype = (endpointLowerCase === "webgpu") ? this.settings.dtypeWebgpu : this.settings.dtypeWasm;
             const message = { type: "connect", data: endpointSetup };
             if ( isTraceMessages ) {
-              utils.trace( "OUT: HeadTTS -> worker, message=", message );
+              utils.trace( "OUT: Talking-module -> worker, message=", message );
             }
             this.ww.postMessage( message );
 
@@ -314,14 +314,14 @@ class HeadTTS {
 
           this.ww.onmessage = (ev) => {
             if ( isTraceMessages ) {
-              utils.trace( "IN: worker -> HeadTTS, message=", ev.data);
+              utils.trace( "IN: worker -> Talking-module, message=", ev.data);
             }
             this.processData(ev.data);
           }
 
           this.ww.onerror = (error) => {
             error.preventDefault();
-            console.error("HeadTTS: Worker error, error=", error);
+            console.error("Talking-module: Worker error, error=", error);
 
             this.emit("error", error, events);
 
@@ -389,7 +389,7 @@ class HeadTTS {
             // Message handler
             this.ws.onmessage = async (ev) => {
               if ( isTraceMessages ) {
-                utils.trace( "IN: WebSocket -> HeadTTS, message=", ev.data);
+                utils.trace( "IN: WebSocket -> Talking-module, message=", ev.data);
               }
               this.processData(ev.data);
             }
@@ -397,7 +397,7 @@ class HeadTTS {
             // Error handler
             this.ws.onerror = (error) => {
               error.preventDefault();
-              console.error("HeadTTS: WebSocket error, error=", error);
+              console.error("Talking-module: WebSocket error, error=", error);
             }
 
             // Connection closed
@@ -412,7 +412,7 @@ class HeadTTS {
                   utils.trace( "WebSocket connection closed cleanly, event=", ev);
                 }
               } else {
-                console.error("HeadTTS: WebSocket connection was closed, event=", ev);
+                console.error("Talking-module: WebSocket connection was closed, event=", ev);
               }
 
             }
@@ -446,7 +446,7 @@ class HeadTTS {
             const response = await fetch(urlHello, request);
             const text = await response.text();
 
-            if ( !text.startsWith("HeadTTS") ) {
+            if ( !text.startsWith("Talking-module") ) {
               throw new Error("Invalid response.");
             }
 
@@ -476,7 +476,7 @@ class HeadTTS {
     } else {
 
       // Report error
-      let msg = "HeadTTS connection failed: " + connectionErrorLog.join("\n");
+      let msg = "Talking-module connection failed: " + connectionErrorLog.join("\n");
       this.emit("error", new Error(msg), events, true );
 
     }
@@ -527,7 +527,7 @@ class HeadTTS {
   async setup( data, onerror=null ) {
     const isTraceMessages = this.settings.trace & utils.traceMask.messages;
     if ( isTraceMessages ) {
-      utils.trace( "SETUP: APP -> HeadTTS, data=",data);
+      utils.trace( "SETUP: APP -> Talking-module, data=",data);
     }
 
     // Check data item
@@ -591,7 +591,7 @@ class HeadTTS {
   */
   async synthesize(data, onmessage=null, onerror=null) {
     if ( this.settings.traceLevel ) {
-      utils.trace( this.settings.traceLevel, 3, "SYNTHESIZE: APP -> HeadTTS, data=",data);
+      utils.trace( this.settings.traceLevel, 3, "SYNTHESIZE: APP -> Talking-module, data=",data);
     }
 
     // Check data item
@@ -754,7 +754,7 @@ class HeadTTS {
   async custom( data, onmessage=null, onerror=null ) {
     const isTraceMessages = this.settings.trace & utils.traceMask.messages;
     if ( isTraceMessages ) {
-      utils.trace( "CUSTOM: APP -> HeadTTS, data=",data);
+      utils.trace( "CUSTOM: APP -> Talking-module, data=",data);
     }
 
     // Check data item
@@ -809,7 +809,7 @@ class HeadTTS {
         Object.assign( this.ttsSetup, item.message.data );
         if ( this.ws ) {
           if ( isTraceMessages ) {
-            utils.trace( "OUT: HeadTTS -> WebSocket, message=", item.message);
+            utils.trace( "OUT: Talking-module -> WebSocket, message=", item.message);
           }
           this.ws.send( JSON.stringify( item.message) );
         }
@@ -846,12 +846,12 @@ class HeadTTS {
         // Send item
         if ( this.ws ) {
           if ( isTraceMessages ) {
-            utils.trace( "OUT: HeadTTS -> WebSocket, message=", item.message);
+            utils.trace( "OUT: Talking-module -> WebSocket, message=", item.message);
           }
           this.ws.send( JSON.stringify( item.message) );
         } else if ( this.ww ) {
           if ( isTraceMessages ) {
-            utils.trace( "OUT: HeadTTS -> worker, message=", item.message);
+            utils.trace( "OUT: Talking-module -> worker, message=", item.message);
           }
 
           // Set default values
@@ -879,7 +879,7 @@ class HeadTTS {
             };
 
             if ( isTraceMessages ) {
-              utils.trace( "OUT: HeadTTS -> REST, message=", item.message.data);
+              utils.trace( "OUT: Talking-module -> REST, message=", item.message.data);
             }
 
             fetch(url, request)
@@ -897,12 +897,12 @@ class HeadTTS {
                 });
               })
               .catch(error => {
-                console.error("HeadTTS: REST error, error=", error);
+                console.error("Talking-module: REST error, error=", error);
                 this.processData({
                   type: "error",
                   ref: item.message.id,
                   data: {
-                    error: "HeadTTS: REST error, message=" + error.message
+                    error: "Talking-module: REST error, message=" + error.message
                   }
                 });
               });
@@ -938,7 +938,7 @@ class HeadTTS {
         try {
           o = JSON.parse(data);
         } catch(error) {
-          console.log("HeadTTS: Data was not a JSON string.");
+          console.log("Talking-module: Data was not a JSON string.");
         }
       } else {
         o = data;
@@ -950,7 +950,7 @@ class HeadTTS {
             item.message = o;
             item.status = 2;
           } else {
-            console.log("HeadTTS: Item not found, ref=", o.ref);
+            console.log("Talking-module: Item not found, ref=", o.ref);
           }
         } else if ( o.type === 'audio' ) {
           const item = this.items.get( o.ref );
@@ -974,17 +974,17 @@ class HeadTTS {
               item.status = 2;
             }
           } else {
-            console.log("HeadTTS: Item not found, ref=", o.ref);
+            console.log("Talking-module: Item not found, ref=", o.ref);
           }
         } else if ( o.type === "progress" ) {
-          console.log("HeadTTS: Progress message.");
+          console.log("Talking-module: Progress message.");
         } else if ( o.type === "ready" ) {
-          console.log("HeadTTS: Ready message.");
+          console.log("Talking-module: Ready message.");
         } else {
-          console.error("HeadTTS: Unknown data type.");
+          console.error("Talking-module: Unknown data type.");
         }
       } else {
-        console.log("HeadTTS: Unknown data format.");
+        console.log("Talking-module: Unknown data format.");
       }
     }
     this.processOut();
@@ -1013,7 +1013,7 @@ class HeadTTS {
         this.emit("message", message, [item.onmessage, this.onmessage] );
         item.deferred.resolve(message);
       } else if ( type === "error" ) {
-        console.error("HeadTTS: Error, item=",item);
+        console.error("Talking-module: Error, item=",item);
         this.emit("error", message, [item.onmessage, this.onmessage] );
         item.deferred.resolve(message);
       }
@@ -1028,4 +1028,4 @@ class HeadTTS {
 
 }
 
-export { HeadTTS };
+export { TalkingModule };

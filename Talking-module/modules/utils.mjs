@@ -61,7 +61,7 @@ export function deepCopy(o) {
 * @param {...any} outputs Output strings.
 */
 export function trace( ...outputs ) {
-  const s = "HeadTTS [" + new Date().toISOString().slice(11, 23) + "] ";
+  const s = "Talking-module [" + new Date().toISOString().slice(11, 23) + "] ";
   console.log(s,...outputs);
 }
 
