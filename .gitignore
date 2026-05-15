@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+
+# Dependencies / generated output
+node_modules/
+dist/
+build/
+coverage/
+
+# Logs
+*.log
